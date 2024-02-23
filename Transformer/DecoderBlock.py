@@ -4,14 +4,14 @@ from ResidualConnection import ResidualConnection
 from MultiHeadAttention import MultiheadAttentionLayer
 from FeedForward import FFN
 class DecoderBlock(torch.nn.Module):
-    def __init__(self, dModel: int, seqLen: int, h: int, dropout: float, eps: float, internalFfnLen: int):
+    def __init__(self, config):
         super().__init__()
-        self.maskMultiHead = MaskedMultiheadAttentionLayer(dModel, seqLen, h, dropout)
-        self.addNorm1 = ResidualConnection(dropout, eps)
-        self.multiHead = MultiheadAttentionLayer(dModel, h, dropout)
-        self.addNorm2 = ResidualConnection(dropout, eps)
-        self.ffn = FFN(dModel, internalFfnLen, dropout)
-        self.addNorm3 = ResidualConnection(dropout, eps)
+        self.maskMultiHead = MaskedMultiheadAttentionLayer(config)
+        self.addNorm1 = ResidualConnection(config)
+        self.multiHead = MultiheadAttentionLayer(config)
+        self.addNorm2 = ResidualConnection(config)
+        self.ffn = FFN(config)
+        self.addNorm3 = ResidualConnection(config)
     def forward(self, EncoderInput, DecoderInput):
         out = self.maskMultiHead(DecoderInput, DecoderInput, DecoderInput)
         x = self.addNorm1(out, DecoderInput)

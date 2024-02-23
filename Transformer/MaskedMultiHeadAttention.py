@@ -1,19 +1,19 @@
 import torch
 import math
 class MaskedMultiheadAttentionLayer(torch.nn.Module):
-  def __init__(self, dModel: int, seqLen: int, h: int, dropout: float):
+  def __init__(self, config):
     super().__init__()
-    self.dModel = dModel
-    self.h = h
-    assert dModel%h == 0, "dModel is not divisible by h"
-    self.dK = dModel//h
-    self.wK = torch.nn.Linear(dModel, dModel)
-    self.wQ = torch.nn.Linear(dModel, dModel)
-    self.wV = torch.nn.Linear(dModel, dModel)
-    mask = torch.triu(torch.ones(seqLen, seqLen))
+    self.dModel = config['dModel']
+    self.h = config['h']
+    assert self.dModel%self.h == 0, "dModel is not divisible by h"
+    self.dK = self.dModel//self.h
+    self.wK = torch.nn.Linear(self.dModel, self.dModel)
+    self.wQ = torch.nn.Linear(self.dModel, self.dModel)
+    self.wV = torch.nn.Linear(self.dModel, self.dModel)
+    mask = torch.triu(torch.ones(config['seqlen'], config['seqlen']))
     self.mask = mask.masked_fill(mask == 1, float('-inf'))
-    self.wO = torch.nn.Linear(dModel, dModel)
-    self.dropout = torch.nn.Dropout(dropout)
+    self.wO = torch.nn.Linear(self.dModel, self.dModel)
+    self.dropout = torch.nn.Dropout(config['dropout'])
   def forward(self, query, key, value):
     query = self.wQ(query)
     key = self.wK(key)

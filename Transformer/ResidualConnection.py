@@ -1,9 +1,9 @@
 import torch
 class ResidualConnection(torch.nn.Module):
-  def __init__(self, dropout: float, eps: float):
+  def __init__(self, config):
     super().__init__()
-    self.dropout = torch.nn.Dropout(dropout)
-    self.eps = eps
+    self.dropout = torch.nn.Dropout(config['dropout'])
+    self.eps = config['eps']
     self.alpha = torch.nn.Parameter(torch.ones(1))
     self.bias = torch.nn.Parameter(torch.zeros(1))
   def forward(self, previousOutput, skipOutput):
