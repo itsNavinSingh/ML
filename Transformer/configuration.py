@@ -2,8 +2,8 @@
 config = {
     "dModel" : 512,
     "seqLen" : 350,
-    "srcVocabSize" : 0,
-    "tgtVocabSize" : 0,
+    "srcVocabSize" : 1000,
+    "tgtVocabSize" : 1000,
     "EncoderNo" : 6,
     "DecoderNo" : 6,
     "dropout" : 0.1,

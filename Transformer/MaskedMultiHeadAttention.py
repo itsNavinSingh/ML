@@ -10,7 +10,7 @@ class MaskedMultiheadAttentionLayer(torch.nn.Module):
     self.wK = torch.nn.Linear(self.dModel, self.dModel)
     self.wQ = torch.nn.Linear(self.dModel, self.dModel)
     self.wV = torch.nn.Linear(self.dModel, self.dModel)
-    mask = torch.triu(torch.ones(config['seqlen'], config['seqlen']))
+    mask = torch.triu(torch.ones(config['seqLen'], config['seqLen']))
     self.mask = mask.masked_fill(mask == 1, float('-inf'))
     self.wO = torch.nn.Linear(self.dModel, self.dModel)
     self.dropout = torch.nn.Dropout(config['dropout'])
