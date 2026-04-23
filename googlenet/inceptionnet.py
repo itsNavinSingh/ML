@@ -3,8 +3,8 @@ import conv_block
 import inception_block
 
 class InceptionNet(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, is_aux = True):
+        super(InceptionNet, self).__init__()
         # (n, 3, 224, 224)
         self.conv1 = conv_block.ConvBlock(
             in_channel = 3,
@@ -147,6 +147,15 @@ class InceptionNet(torch.nn.Module):
             in_features=1024,
             out_features=1000
         )
+
+        self.is_aux = is_aux
+        # Aux block
+        if is_aux:
+            self.aux1 = inception_block.AuxInceptionBlock(in_feature=512, out_feature=1000)
+            self.aux2 = inception_block.AuxInceptionBlock(in_feature=528, out_feature=1000)
+        else:
+            self.aux1 = self.aux2 = None
+
     def forward(self, x):
         x = self.conv1(x)
         x = self.pool1(x)
@@ -156,10 +165,18 @@ class InceptionNet(torch.nn.Module):
         x = self.inception3b(x)
         x = self.pool3(x)
         x = self.inception4a(x)
+
+        if self.is_aux and self.training:
+            aux1 = self.aux1(x)
+
         x = self.inception4b(x)
         x = self.inception4b(x)
         x = self.inception4c(x)
         x = self.inception4d(x)
+
+        if self.is_aux and self.training:
+            aux2 = self.aux2(x)
+
         x = self.inception4e(x)
         x = self.pool4(x)
         x = self.inception5a(x)
@@ -168,4 +185,8 @@ class InceptionNet(torch.nn.Module):
         x = x.view(x.size(0), -1)
         x = self.dropout(x)
         x = self.fc(x)
+        
+        if self.is_aux and self.training:
+            return aux1, aux2, x
+        
         return x

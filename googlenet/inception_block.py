@@ -63,3 +63,35 @@ class InceptionBlock(torch.nn.Module):
         return torch.cat([
             self.branch1(x), self.branch2(x), self.branch3(x), self.branch4(x)
         ], 1)
+    
+class AuxInceptionBlock(torch.nn.Module):
+    def __init__(self, in_feature, out_feature):
+        super(AuxInceptionBlock, self).__init__()
+        self.pool = torch.nn.MaxPool2d(
+            kernel_size=(5, 5),
+            stride=(3, 3)
+        )
+        self.conv = conv_block.ConvBlock(
+            in_channel=in_feature,
+            out_channel=128,
+            kernel_size=(1, 1)
+        )
+        self.fc1 = torch.nn.Linear(
+            in_features=2048,
+            out_features=1024
+        )
+        self.activ = torch.nn.ReLU()
+        self.dropout = torch.nn.Dropout(0.7)
+        self.fc2 = torch.nn.Linear(
+            in_features=1024,
+            out_features=out_feature
+        )
+    def forward(self, x):
+        x = self.pool(x)
+        x = self.conv(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc1(x)
+        x = self.activ(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
