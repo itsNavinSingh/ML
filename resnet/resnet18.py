@@ -6,6 +6,7 @@ class ConvBlock(torch.nn.Module):
         self.conv = torch.nn.Conv2d(
             in_channels=in_channels,
             out_channels=out_channels,
+            bias=False,
             **kwargs
         )
         self.bnorm = torch.nn.BatchNorm2d(num_features=out_channels)
@@ -149,14 +150,14 @@ class ResNet18(torch.nn.Module):
         super(ResNet18, self).__init__()
         self.layer1 = torch.nn.Sequential(
             ConvBlock(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3),
-            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
-            torch.nn.ReLU()
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
         self.layer2 = Layer2()
         self.layer3 = Layer3()
         self.layer4 = Layer4()
         self.layer5 = Layer5()
-        self.avgpool = torch.nn.MaxPool2d(kernel_size=7)
+        self.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=(1, 1))
         self.fc = torch.nn.Linear(in_features=512, out_features=1000)
     def forward(self, x):
         x = self.layer1(x)
